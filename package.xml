@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>stingray_sim</name>
+  <version>0.0.0</version>
+  <description>
+  The stingray_sim package with a Triton robot that follows walls. 
+  
+  The wall following code is divided as so:
+  'scripts/q_td_train.py' is the training code that uses the Q-learning algroithm
+  'scripts/q_td_run.py' is the testing code that uses the Q-learning algroithm 
+  'scripts/sarsa_train.py' is the training code that uses the SARSA algroithm 
+  'scripts/sarsa_run.py' is the testing code that uses the SARSA algroithm 
+
+  To run:
+  1. Place this package in the 'src' folder of your catkin workspace.
+  2. Execute: 'cd ~/catkin_ws' followed by: 'catkin_make'. Ensure that the workspace has been sourced.
+  3. Execute: 'roslaunch stingray_sim wall_following.launch choice_and_mode:=x'. where x can be 1,2,3 or 4.
+      1 = q_td_train.py
+      2 = q_td_run.py
+      3 = sarsa_train.py
+      4 = sarsa_run.py
+     This will launch rviz and gazebo and then will start the simulation using the selected algroithm and mode.
+     The generated log files should be available in your '.ros' folder (which should be in your Home directory).
+
+  Regarding generating and using pickled q-tables:
+  1. The scripts folder contains two pickle files for the best learned q-tables for both
+    algroithms: q_td_q_table.pkl and sarsa_q_table.pkl.
+
+  2. To use them with the run files, place these files in your '.ros' folder before running q_td_run.py or sarsa_run.py
+
+  3. After each step of each episode, the training files dump the currently learned q-tables to the '.ros' folder directly 
+      as either 'q_td_trained_q_table.pkl' or 'sarsa_trained_q_table.pkl'. To use these files along with the run.py files, 
+      rename them as 'q_td_q_table.pkl' or 'sarsa_q_table.pkl' before running q_td_run.py or sarsa_run.py
+  
+  </description>
+
+  <maintainer email="kantonygomez@umass.edu">Kevin Antony Gomez</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>tf</build_depend>
+  <build_export_depend>gazebo_ros</build_export_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <gazebo_ros gazebo_media_path="${prefix}"/>
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+  </export>
+</package>

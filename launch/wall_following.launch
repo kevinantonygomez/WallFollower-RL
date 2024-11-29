@@ -1,0 +1,49 @@
+<launch>
+    <arg name="world_file" default="worlds/largemaze.world"/>
+    <arg name="robot_name" default="triton"/>
+    <arg name="sdf_robot_file" default="$(find stingray_sim)/models/$(arg robot_name)/model.sdf"/>
+    <arg name="x" default="0.0" />
+    <arg name="y" default="0.0" />
+    <arg name="z" default="0.0" />
+    <arg name="roll" default="0.0" />
+    <arg name="pitch" default="0.0" />
+    <arg name="yaw" default="0.0" />
+    <arg name="choice_and_mode" default="1" /> <!-- 1 = q_td_train, 2 = q_td_run, 3 = sarsa_train, 4 = sarsa_run -->
+
+  
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="use_sim_time" value="true"/>
+      <arg name="debug" value="false "/>  <!-- false for real training, true for debugging -->
+      <arg name="paused" value="false"/>
+      <arg name="gui" value="true" />
+      <arg name="world_name" value="$(arg world_file)"/>
+      <arg name="verbose" value="true"/>
+      <arg name="recording" value="false"/>
+    </include>
+
+    <node pkg="gazebo_ros" type="spawn_model" name="$(arg robot_name)_spawn_urdf" respawn="false" output="screen" 
+    args="-file $(arg sdf_robot_file) -sdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -model $(arg robot_name)" />
+    
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_base_scan" args="0 0 0.161 0 0 0 /base_link /base_scan 100" />
+    <node pkg="tf" type="static_transform_publisher" name="world_to_odom" args="0 0 0 0 0 0 /world /odom 100" />
+    <node pkg="stingray_sim" type="position_publisher.py" name="position_publisher" />
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find stingray_sim)/rviz/lidar.rviz" />
+    
+    <group if="$(eval choice_and_mode == 1)">
+      <node pkg="stingray_sim" type="q_td_train.py" name="q_td_train"/>
+    </group>
+
+    <group if="$(eval choice_and_mode == 2)">
+      <node pkg="stingray_sim" type="q_td_run.py" name="q_td_run"/>
+    </group>
+
+    <group if="$(eval choice_and_mode == 3)">
+      <node pkg="stingray_sim" type="sarsa_train.py" name="sarsa_train"/>
+    </group>
+
+    <group if="$(eval choice_and_mode == 4)">
+      <node pkg="stingray_sim" type="sarsa_run.py" name="sarsa_run"/>
+    </group>
+    
+</launch>
